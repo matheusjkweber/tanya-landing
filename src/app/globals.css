@@ -1,0 +1,189 @@
+@import "tailwindcss";
+
+/* ------------------------------------------------------------------ *
+ * Tanya — "warm terminal control room" design system
+ * Near-black warm charcoal, always-on amber-gold brand, a semantic
+ * verify-green reserved for the deterministic-verifier proof points.
+ * ------------------------------------------------------------------ */
+
+@theme {
+  /* Surfaces — warm stone, not cold gray */
+  --color-ink: #0a0908;
+  --color-ink-1: #0f0d0b;
+  --color-ink-2: #16130f;
+  --color-ink-3: #211c16;
+  --color-line: #2a241d;
+  --color-line-soft: #1c1813;
+
+  /* Text */
+  --color-cream: #f6f1e7;
+  --color-cream-dim: #cdc3b2;
+  --color-muted: #938a7b;
+
+  /* Brand — amber-gold (affordable, always-on, sunlit) */
+  --color-amber: #f7b733;
+  --color-amber-bright: #ffc955;
+  --color-amber-deep: #c98a16;
+
+  /* Semantic — verify-green (reserved for the verifier / pass states) */
+  --color-verify: #5ce6a0;
+  --color-verify-deep: #1f9d63;
+
+  /* Secondary personality accent — warm coral for Tanya's voice */
+  --color-coral: #ff6b5a;
+
+  --font-display: var(--font-space-grotesk), ui-sans-serif, system-ui, sans-serif;
+  --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+  --font-mono: var(--font-jetbrains-mono), ui-monospace, "SF Mono", Menlo, monospace;
+
+  --radius-card: 1rem;
+
+  --shadow-glow-amber: 0 0 0 1px rgba(247, 183, 51, 0.18), 0 18px 60px -20px rgba(247, 183, 51, 0.35);
+  --shadow-panel: 0 1px 0 0 rgba(246, 241, 231, 0.04) inset, 0 30px 80px -40px rgba(0, 0, 0, 0.9);
+}
+
+@layer base {
+  * {
+    border-color: var(--color-line);
+  }
+
+  html {
+    scroll-behavior: smooth;
+    -webkit-text-size-adjust: 100%;
+  }
+
+  body {
+    background-color: var(--color-ink);
+    color: var(--color-cream);
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+    overflow-x: hidden;
+  }
+
+  ::selection {
+    background: rgba(247, 183, 51, 0.28);
+    color: var(--color-cream);
+  }
+
+  /* Focus ring — visible, brand-tinted, accessible */
+  :focus-visible {
+    outline: 2px solid var(--color-amber);
+    outline-offset: 2px;
+    border-radius: 4px;
+  }
+}
+
+@layer utilities {
+  /* Warm ambient backdrop: layered radial glows + faint grid */
+  .bg-control-room {
+    background-color: var(--color-ink);
+    background-image:
+      radial-gradient(60rem 40rem at 78% -8%, rgba(247, 183, 51, 0.12), transparent 60%),
+      radial-gradient(46rem 34rem at 6% 8%, rgba(255, 107, 90, 0.07), transparent 55%),
+      radial-gradient(50rem 50rem at 50% 120%, rgba(92, 230, 160, 0.06), transparent 60%);
+  }
+
+  .bg-grid {
+    background-image:
+      linear-gradient(to right, rgba(246, 241, 231, 0.035) 1px, transparent 1px),
+      linear-gradient(to bottom, rgba(246, 241, 231, 0.035) 1px, transparent 1px);
+    background-size: 56px 56px;
+    -webkit-mask-image: radial-gradient(ellipse 80% 60% at 50% 30%, #000 40%, transparent 100%);
+    mask-image: radial-gradient(ellipse 80% 60% at 50% 30%, #000 40%, transparent 100%);
+  }
+
+  .text-gradient-amber {
+    background: linear-gradient(100deg, var(--color-amber-bright) 0%, var(--color-amber) 45%, var(--color-coral) 120%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+
+  .glass-panel {
+    background: linear-gradient(180deg, rgba(33, 28, 22, 0.7), rgba(15, 13, 11, 0.7));
+    backdrop-filter: blur(10px);
+    border: 1px solid var(--color-line);
+  }
+
+  .terminal-shadow {
+    box-shadow: var(--shadow-panel);
+  }
+
+  /* Soft blinking caret for terminal motifs */
+  .caret-blink::after {
+    content: "▍";
+    color: var(--color-amber);
+    animation: caret 1.1s steps(2, start) infinite;
+    margin-left: 1px;
+  }
+
+  @keyframes caret {
+    0%, 50% { opacity: 1; }
+    50.01%, 100% { opacity: 0; }
+  }
+
+  /* Entrance reveal — CSS-only so content is never gated on JS/scroll/hydration.
+     fill-mode `both` holds the hidden state through the stagger delay, then the
+     animation always runs on first paint and settles visible. */
+  .reveal {
+    animation: reveal-up 0.6s cubic-bezier(0.22, 1, 0.36, 1) both;
+  }
+  @keyframes reveal-up {
+    from {
+      opacity: 0;
+      transform: translateY(18px);
+    }
+    to {
+      opacity: 1;
+      transform: none;
+    }
+  }
+
+  .animate-scanline {
+    animation: scanline 6s linear infinite;
+  }
+  @keyframes scanline {
+    0% { transform: translateY(-100%); }
+    100% { transform: translateY(2000%); }
+  }
+
+  /* ---------------------------------------------------------------- *
+   * Native <details> FAQ — zero JavaScript.
+   * Replaced the Radix accordion so the FAQ opens/closes even when React
+   * never hydrates (a preview proxy was corrupting the inline hydration
+   * payload, killing all client interactivity). <details>/<summary> is a
+   * browser primitive — it works with no JS at all.
+   * ---------------------------------------------------------------- */
+  .faq-item > summary {
+    list-style: none;
+    cursor: pointer;
+  }
+  .faq-item > summary::-webkit-details-marker {
+    display: none;
+  }
+  .faq-item[open] {
+    border-color: rgba(247, 183, 51, 0.3);
+  }
+  .faq-item[open] .faq-plus {
+    transform: rotate(45deg);
+  }
+  .faq-item[open] .faq-answer {
+    animation: faq-open 0.28s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+  @keyframes faq-open {
+    from { opacity: 0; transform: translateY(-6px); }
+    to { opacity: 1; transform: none; }
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+}
